@@ -103,6 +103,7 @@ echo "### Building $NEWLIB ###"
 mkdir -p "$BUILDDIR/$NEWLIB"
 cd "$BUILDDIR/$NEWLIB"
 
+export CFLAGS_FOR_TARGET="-Os -g -ffunction-sections -fdata-sections -fomit-frame-pointer -ffast-math"
 "$SRCDIR/$NEWLIB/configure" --prefix=/usr \
 	--target=$TARGET \
 	--enable-languages="c" \
@@ -115,6 +116,7 @@ make -j$NPROC
 DESTDIR=$INSTALLDIR/$NEWLIB make install
 cp -r "$INSTALLDIR/$NEWLIB/usr/" "$STAGINGDIR"
 cp -r "$INSTALLDIR/$NEWLIB/usr/"* /usr/
+unset CFLAGS_FOR_TARGET
 
 echo "### Building final $GCC ###"
 mkdir -p "$BUILDDIR/$GCC"
