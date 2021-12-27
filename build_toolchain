@@ -25,6 +25,7 @@ PKGDIR="$BASEDIR/pkg"
 SRCDIR="$BASEDIR/src"
 BUILDDIR="$BASEDIR/build"
 INSTALLDIR="$BASEDIR/install"
+STAGINGDIR="$BASEDIR/staging"
 
 SOURCES="http://ftp.gnu.org/gnu/binutils/${BINUTILS}.tar.xz \
 	http://ftp.gnu.org/gnu/gcc/${GCC}/${GCC}.tar.xz \
@@ -33,10 +34,11 @@ SOURCES="http://ftp.gnu.org/gnu/binutils/${BINUTILS}.tar.xz \
 	http://ftp.gnu.org/gnu/gmp/${GMP}.tar.xz \
 	ftp://sourceware.org/pub/newlib/${NEWLIB}.tar.gz"
 
-mkdir -p pkg
-mkdir -p src
-mkdir -p build
-mkdir -p install
+mkdir -p "$PKGDIR"
+mkdir -p "$SRCDIR"
+mkdir -p "$BUILDDIR"
+mkdir -p "$INSTALLDIR"
+mkdir -p "$STAGINGDIR"
 
 cd "$PKGDIR"
 for URL in $SOURCES
@@ -68,8 +70,8 @@ make -j$NPROC
 make prefix="$INSTALLDIR/$BINUTILS/usr" install
 rm -rf "$INSTALLDIR/$BINUTILS/usr/share"
 rm "$INSTALLDIR/$BINUTILS/usr/lib/bfd-plugins/libdep.so"
-
-sudo cp -ar "$INSTALLDIR/$BINUTILS/usr/"* /usr/
+cp -r "$INSTALLDIR/$BINUTILS/usr/" "$STAGINGDIR"
+cp -r "$INSTALLDIR/$BINUTILS/usr/"* /usr/
 
 echo "### Building $GCC bootstrap ###"
 
@@ -95,9 +97,7 @@ cd "$BUILDDIR/$GCC-bootstrap"
 make -j$NPROC all-gcc
 make DESTDIR="$INSTALLDIR/$GCC-bootstrap" install-strip-gcc
 rm -rf "$INSTALLDIR/$GCC-bootstrap/usr/share"
-strip "$INSTALLDIR/$GCC-bootstrap/usr/bin/"* 2>/dev/null || true
-find "$INSTALLDIR/$GCC-bootstrap/usr/lib" -type f -exec $TARGET-strip --strip-unneeded {} \; 2>/dev/null || true
-sudo cp -ar "$INSTALLDIR/$GCC-bootstrap/usr/"* /usr/
+cp -r "$INSTALLDIR/$GCC-bootstrap/usr/"* /usr/
 
 echo "### Building $NEWLIB ###"
 mkdir -p "$BUILDDIR/$NEWLIB"
@@ -113,7 +113,8 @@ cd "$BUILDDIR/$NEWLIB"
 
 make -j$NPROC
 DESTDIR=$INSTALLDIR/$NEWLIB make install
-sudo cp -ar "$INSTALLDIR/$NEWLIB/usr/"* /usr/
+cp -r "$INSTALLDIR/$NEWLIB/usr/" "$STAGINGDIR"
+cp -r "$INSTALLDIR/$NEWLIB/usr/"* /usr/
 
 echo "### Building final $GCC ###"
 mkdir -p "$BUILDDIR/$GCC"
@@ -137,8 +138,7 @@ rm "$INSTALLDIR/$GCC/usr/lib/libcc1.so"
 rm "$INSTALLDIR/$GCC/usr/lib/libcc1.so.0"
 rm "$INSTALLDIR/$GCC/usr/lib/libcc1.so.0.0.0"
 
-strip "$INSTALLDIR/$GCC/usr/bin/"* 2>/dev/null || true
-find "$INSTALLDIR/$GCC/usr/lib" -type f -exec $TARGET-strip --strip-unneeded {} \; 2>/dev/null || true
-sudo cp -ar "$INSTALLDIR/$GCC/usr/"* /usr/
+cp -ar "$INSTALLDIR/$GCC/usr/" "$STAGINGDIR"
+cp -r "$INSTALLDIR/$GCC/usr/"* /usr/
 
 echo "### DONE! ###"
