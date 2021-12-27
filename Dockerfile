@@ -7,9 +7,11 @@ RUN cd /tmp/m68k && ./build_toolchain
 
 # Second stage, just create the m68k user and copy the built files
 FROM debian:bullseye
+RUN apt-get update && apt-get install -y make
 COPY --from=buildstage /tmp/m68k/staging/usr/ /usr/
 RUN useradd -ms /bin/bash -d /m68k m68k
 
 USER m68k
 WORKDIR /m68k
-ENTRYPOINT /bin/bash
+ENTRYPOINT [ "/bin/bash" ]
+CMD [ "-c", "make" ]
