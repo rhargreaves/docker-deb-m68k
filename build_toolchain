@@ -139,8 +139,12 @@ rm -rf "$INSTALLDIR/$GCC/usr/share"
 rm "$INSTALLDIR/$GCC/usr/lib/libcc1.so"
 rm "$INSTALLDIR/$GCC/usr/lib/libcc1.so.0"
 rm "$INSTALLDIR/$GCC/usr/lib/libcc1.so.0.0.0"
+# Add a link to LTO plugin in the right location
+mkdir -p "$INSTALLDIR/$GCC/usr/lib/bfd-plugins"
+ln -s "/usr/libexec/gcc/m68k-elf/11.2.0/liblto_plugin.so" "$INSTALLDIR/$GCC/usr/lib/bfd-plugins/liblto_plugin.so"
 
 cp -ar "$INSTALLDIR/$GCC/usr/" "$STAGINGDIR"
+rm /usr/lib/bfd-plugins/liblto_plugin.so
 cp -r "$INSTALLDIR/$GCC/usr/"* /usr/
 
 echo "### DONE! ###"
