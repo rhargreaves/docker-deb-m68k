@@ -4,7 +4,7 @@ set -e
 NPROC=$(($(nproc) + 1))
 
 _binu_ver=2.37
-_gcc_ver=11.2.0
+_gcc_ver=6.3.0
 _mpfrver=4.1.0
 _mpcver=1.2.1
 _gmpver=6.2.1
@@ -28,7 +28,7 @@ INSTALLDIR="$BASEDIR/install"
 STAGINGDIR="$BASEDIR/staging"
 
 SOURCES="http://ftp.gnu.org/gnu/binutils/${BINUTILS}.tar.xz \
-	http://ftp.gnu.org/gnu/gcc/${GCC}/${GCC}.tar.xz \
+	http://ftp.gnu.org/gnu/gcc/${GCC}/${GCC}.tar.bz2 \
 	http://ftp.gnu.org/gnu/mpfr/${MPFR}.tar.xz \
 	http://ftp.gnu.org/gnu/mpc/${MPC}.tar.gz \
 	http://ftp.gnu.org/gnu/gmp/${GMP}.tar.xz \
@@ -83,6 +83,9 @@ ln -fs ../$GMP gmp
 mkdir -p "$BUILDDIR/$GCC-bootstrap"
 cd "$BUILDDIR/$GCC-bootstrap"
 
+# These flags are required to build older versions of GCC
+export CFLAGS="$CFLAGS -Wno-implicit-fallthrough -Wno-cast-function-type -fpermissive"
+export CXXFLAGS="$CXXFLAGS -Wno-implicit-fallthrough -Wno-cast-function-type -fpermissive"
 "$SRCDIR/$GCC/configure" --prefix=/usr \
 	--target=$TARGET \
 	--enable-languages="c" \
