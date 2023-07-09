@@ -11,9 +11,6 @@ env:
 
 jobs:
   buildx:
-    strategy:
-      matrix:
-        platform: ['linux/amd64', 'linux/arm64']
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -38,6 +35,6 @@ jobs:
         with:
           image: ${{ env.REGISTRY }}/${{ github.repository }}
           context: .
-          platforms: ${{ matrix.platform }}
+          platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ env.REGISTRY }}/${{ github.repository }}:latest,${{ env.REGISTRY }}/${{ github.repository }}:${{ github.run_number }}
